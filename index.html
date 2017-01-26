@@ -13,7 +13,8 @@
 
 
 <!-- use below here for the demo -->
-<script language="javascript" type="text/javascript" src="data/flare.js"></script>
+<!--script type="text/javascript" src="data/flare.js"></script -->
+<script type="text/javascript" src="data/test1.js"></script>
 
 </head>
  
@@ -86,7 +87,8 @@ Max depth to show:
 
 <script language="javascript">
 
-
+//https://bl.ocks.org/mkedwards/759e719eefe36cf9c8ab
+	
 function make_regular_polygon(width, height, border, sides) {
 	var center = [width*0.5, height*0.5],
 		width_radius = (width - 2*border) * 0.5,
@@ -117,8 +119,8 @@ function make_regular_polygon(width, height, border, sides) {
 }
 
 // here we set up the svg
-var width = 1000;
-var height = 800;
+var width = 1200;
+var height = 1000;
 var border = 10;
 var svg_container = d3.select("body").append("svg")
 	.attr("width",width)
@@ -202,7 +204,8 @@ var paint = function(nodes){
 	}
 	else if (select_color == "name") {
 		var color_d3 = d3.scale.category20c();
-		var color_func = function(d) { return d.children ? color_d3(d.name) : "none"; };
+		//var color_func = function(d) { return d.children ? color_d3(d.name) : "none"; };
+		var color_func = function(d) { return color_d3(d.name)  };
 	}
 	else {
 		// none or some other weird thing ;)
@@ -230,10 +233,31 @@ var paint = function(nodes){
 	polylines.enter().append("path")
 	        .attr("d", function(d) {return make_d3_poly(d.polygon);})
 			.attr("stroke-width", function(d) { return Math.max(stroke_max - stroke_delta*d.depth, stroke_min) + "px";})
-	        .attr("stroke", "black")
+	        .attr("stroke", "#fff")
 	        .attr("fill", color_func);
     polylines.exit().remove();
 	
+	
+	var polytext = svg_container.append("g").selectAll("text").data(selected_node_list);
+	polytext.enter().append("text")
+	.attr("x", function(d, i ){
+		console.log(d)
+		if(d.depth == 1 )
+			return d.site.x;
+	})
+    .attr("dy", function(d){
+		if(d.depth == 1)
+			return d.site.y;
+		//else
+		//	return 30;
+	})
+	.style("font-size", function(d){
+			if(d.depth == 2)
+				return d.size + 10;
+	})
+	.style("fill","#000")
+    .text(function(d, i) { return d.name; });
+		
 	
 	// also circles?  only for leaves?
 	// a subset of selected_node_list as it turns out
@@ -257,8 +281,8 @@ var paint = function(nodes){
 			.attr("r", function(d) {return 5;})
 			//.attr("r", function(d) {return (Math.sqrt(d.weight));})
 			//.attr("r", function(d) {return (Math.max(Math.sqrt(d.weight), 2));})
-			.attr("stroke", "black")
-			.attr("fill", "black");
+			.attr("stroke", "white")
+			.attr("fill", "none");
 	}
 	
 	// weight circles
@@ -286,7 +310,7 @@ function compute() {
 
 	var vt = d3.layout.voronoitreemap()
 		.root_polygon(select_polygon)
-		.value(function(d) {return d.mean; }) //size
+		.value(function(d) {return d.size; }) //size
 		.iterations(100);
 	
 	var select_dataset = get_selected_dataset();
