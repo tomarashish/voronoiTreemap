@@ -1,4 +1,4 @@
-var flare_json = {
+flare_json = {
   "mean": 1.0,
   "children": [
     {
